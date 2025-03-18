@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>赛迦奥特曼·光之数学战争</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        :root {
+            --saga-green: #28a745;
+            --saga-blue: #00b4ff;
+            --saga-gold: #ffd700;
+            --dark-bg: rgba(10, 15, 46, 0.8);
+            --btn-bg: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 24px;
+            background: var(--dark-bg) url('https://puui.qpic.cn/vpic_cover/w33344iyws1/w33344iyws1_hz.jpg/1280') no-repeat center center;
+            background-size: cover;
+            color: white;
+            text-align: center;
+            margin: 0;
+            min-height: 100vh;
+            touch-action: manipulation;
+            position: relative;
+            padding-top: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            position: relative;
+            z-index: 10;
+        }
+
+        #intro p {
+            font-size: 28px;
+        }
+
+        .button {
+            background: var(--saga-green);
+            color: white;
+            font-size: 28px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px #1e7e34;
+            transition: all 0.2s;
+            margin: 10px;
+        }
+
+        .button:active {
+            box-shadow: 0 2px #1e7e34;
+            transform: translateY(3px);
+        }
+
+        .top-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .small-button {
+            font-size: 18px;
+            padding: 10px 15px;
+            background: var(--btn-bg);
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .small-button img {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        #heroBoard {
+            display: none;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: scroll;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 30px;
+            background-color: #444;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--saga-blue);
+            width: 0%;
+            border-radius: 15px;
+        }
+
+        .glow-effect {
+            animation: glow-animation 1s infinite;
+        }
+
+        @keyframes glow-animation {
+            0% {
+                box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8);
+            }
+
+            50% {
+                box-shadow: 0 0 20px 15px rgba(255, 255, 255, 0.8);
+            }
+
+            100% {
+                box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        #question {
+            font-size: 72px;
+            background-color: #888;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        #answer {
+            font-size: 32px;
+        }
+
+        #message {
+            font-size: 36px;
+            min-height: 60px;
+        }
+
+        #energy {
+            font-size: 36px;
+            color: var(--saga-gold);
+        }
+
+        #countdown {
+            font-size: 36px;
+            color: white;
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            opacity: 0.5;
+            display: none;
+        }
+
+        #settings {
+            display: none;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #settings label {
+            font-size: 22px;
+            color: white;
+        }
+
+        #settings select,
+        #settings input {
+            font-size: 20px;
+            padding: 5px;
+        }
+
+        /* 倒计时最后 3 秒样式 */
+        #countdown.warning {
+            color: red;
+            animation: pulse 1s infinite;
+            transform: scale(1.2);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="intro">
+            <h1>🦸♂️ 赛迦奥特曼·光之数学战争 🦹♂️</h1>
+            <p>用数学之光击败它们！</p>
+            <button class="button" onclick="startGame()">启动等离子火花！</button>
+        </div>
+
+        <div class="top-buttons">
+            <button class="small-button" onclick="showHeroBoard()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Star_icon_24px.png" alt="star">🌟 光之英雄榜
+            </button>
+            <button class="small-button" onclick="confirmEndGame()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Home_icon.png" alt="home">🏠 返回基地
+            </button>
+            <button class="small-button" onclick="showSettings()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Settings_icon.png" alt="settings">⚙ 设置
+            </button>
+        </div>
+
+        <div id="game" style="display: none;">
+            <h2>光之战士：<span id="playerName" style="color: var(--saga-gold);"></span></h2>
+            <div id="energy">光之能量：0</div>
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div id="question"></div>
+            <input type="number" id="answer" placeholder="输入光能数值" autofocus>
+            <button class="button" onclick="launchLightWave()">发射光波！</button>
+            <div id="message"></div>
+        </div>
+
+        <div id="settings" style="display: none;">
+            <h2>⚙ 设置挑战模式</h2>
+            <label>选择挑战类型：</label>
+            <select id="challengeType">
+                <option value="add_100">加法（总和≤100）</option>
+                <option value="add_500">加法（总和≤500）</option>
+                <option value="mul_seq">乘法口诀（顺序）</option>
+                <option value="mul_rand" selected>乘法口诀（乱序）</option>
+            </select>
+
+            <br><br>
+            <label>挑战数量（10 - 100）：</label>
+            <input type="number" id="challengeCount" min="10" max="100" value="20">
+
+            <br><br>
+            <label>限时模式：</label>
+            <select id="timedModeSelect" onchange="toggleTimeOptions()">
+                <option value="yes" selected>是</option>
+                <option value="no">否</option>
+            </select>
+
+            <div id="timeOptions" style="display: block;">
+                <br>
+                <label>每道题限时（秒）：</label>
+                <input type="number" id="timePerQuestion" min="5" max="30" value="15">
+            </div>
+
+            <br><br>
+            <button class="button" onclick="saveSettings()">保存设置</button>
+        </div>
+
+        <div id="heroBoard">
+            <h2>🌟 光之英雄榜</h2>
+            <table border="1" style="width: 100%; color: white; text-align: left;">
+                <tr>
+                    <th>排名</th>
+                    <th>玩家</th>
+                    <th>得分</th>
+                    <th>挑战时间</th>
+                </tr>
+                <tbody id="heroList"></tbody>
+            </table>
+            <button class="button" onclick="closeHeroBoard()">关闭</button>
+            <button class="button" style="background-color: #dc3545;" onclick="clearHeroData()">清除历史记录</button>
+        </div>
+    </div>
+
+    <div id="countdown">00:00</div>
+
+    <script>
+        let heroData = JSON.parse(localStorage.getItem('heroData')) || [];
+        let currentChallenge = 0;
+        let totalChallenges = 20;
+        let score = 0;
+        let playerName = '';
+        let countdownTimer;
+        let startTime = 0;
+        let challengeTime = 0;
+        const correctMessages = [
+            "你是数学小天才，继续加油，赛迦奥特曼为你骄傲！",
+            "答对啦，你的思维就像赛迦的光线一样敏锐！",
+            "太厉害啦，这么难的题都被你轻松搞定！",
+            "回答正确，你就像赛迦一样强大无敌！",
+            "哇，答案完全正确，你就是数学战场上的英雄！",
+            "答对咯，你的智慧如同赛迦的光芒闪耀！",
+            "太牛啦，这么快就得出正确答案了！",
+            "回答正确，继续保持这超棒的状态！",
+            "答对啦，你在数学世界里就像赛迦一样所向披靡！",
+            "太出色啦，正确答案就是属于你的勋章！"
+        ];
+        const wrongMessages = [
+            "别灰心，再思考一下，你一定能战胜这道题！",
+            "虽然这次答错了，但赛迦的勇气会让你下次答对！",
+            "没关系，失败是成功之母，再试试肯定行！",
+            "答错没关系，你的智慧正在不断成长，加油！",
+            "别气馁，再仔细想想，胜利就在前方！",
+            "这次有点小失误，不过你很快就能找到正确方向！",
+            "答错不可怕，你就像赛迦一样，会不断强大起来！",
+            "不要着急，再认真算一算，你可以的！",
+            "虽然答错了，但你的努力赛迦都看在眼里，加油！",
+            "小挫折不算什么，你马上就能攻克这道难题！"
+        ];
+
+        function startGame() {
+            playerName = prompt("请输入你的名字：") || "无名勇者";
+            document.getElementById("playerName").textContent = playerName;
+            document.getElementById("intro").style.display = "none";
+            document.getElementById("game").style.display = "block";
+            totalChallenges = parseInt(document.getElementById("challengeCount").value) || 20;
+            const timedMode = document.getElementById("timedModeSelect").value === "yes";
+            const timePerQuestion = parseInt(document.getElementById("timePerQuestion").value) || 15;
+            currentChallenge = 0;
+            score = 0;
+            challengeTime = 0;
+            startTime = Date.now();
+            document.getElementById("energy").textContent = `光之能量：${score}`;
+
+            if (timedMode) {
+                document.getElementById("countdown").style.display = "block";
+                startCountdown(timePerQuestion);
+            }
+
+            showNewQuestion();
+        }
+
+        function startCountdown(time) {
+            let countdown = time;
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.textContent = countdown.toString().padStart(2, '0');
+            countdownElement.classList.remove('warning');
+            clearInterval(countdownTimer);
+            countdownTimer = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown.toString().padStart(2, '0');
+                if (countdown <= 3) {
+                    countdownElement.classList.add('warning');
+                } else {
+                    countdownElement.classList.remove('warning');
+                }
+                if (countdown < 0) {
+                    clearInterval(countdownTimer);
+                    launchLightWave();
+                }
+            }, 1000);
+        }
+
+        function showNewQuestion() {
+            currentChallenge++;
+            if (currentChallenge > totalChallenges) {
+                endGame();
+                return;
+            }
+            const question = generateQuestion();
+            document.getElementById("question").textContent = question.text;
+            document.getElementById("answer").value = '';
+            document.getElementById("answer").focus();
+            document.getElementById("message").textContent = '';
+
+            const timedMode = document.getElementById("timedModeSelect").value === "yes";
+            if (timedMode) {
+                const timePerQuestion = parseInt(document.getElementById("timePerQuestion").value) || 15;
+                startCountdown(timePerQuestion);
+            }
+        }
+
+        function generateQuestion() {
+            const type = document.getElementById("challengeType").value;
+            if (type.startsWith('add')) {
+                const max = type === 'add_100' ? 100 : 500;
+                const a = Math.floor(Math.random() * max) + 1;
+                const b = Math.floor(Math.random() * (max - a)) + 1;
+                return { text: `${a} + ${b} = ?`, answer: a + b };
+            } else {
+                const factors = type === 'mul_seq' ? getSequenceFactors() : getRandomFactors();
+                return { text: `${factors[0]} × ${factors[1]} = ?`, answer: factors[0] * factors[1] };
+            }
+        }
+
+        function getSequenceFactors() {
+            const current = currentChallenge % 81 + 1;
+            return [Math.ceil(current / 9), current % 9 || 9];
+        }
+
+        function getRandomFactors() {
+            return [Math.floor(Math.random() * 9) + 1, Math.floor(Math.random() * 9) + 1];
+        }
+
+        function launchLightWave() {
+            clearInterval(countdownTimer);
+            const userAnswer = parseInt(document.getElementById("answer").value);
+            const questionText = document.getElementById("question").textContent;
+            const correctAnswer = parseInt(questionText.split('=')[0].split(' ').filter(Number).reduce((acc, num) => {
+                if (questionText.includes('+')) {
+                    return acc + parseInt(num);
+                } else if (questionText.includes('×')) {
+                    return acc * parseInt(num);
+                }
+            }, questionText.includes('+') ? 0 : 1));
+
+            const messageElement = document.getElementById("message");
+            if (userAnswer === correctAnswer) {
+                score += 10;
+                const randomIndex = Math.floor(Math.random() * correctMessages.length);
+                const message = `回答正确！<br>${correctMessages[randomIndex]}`;
+                messageElement.innerHTML = message;
+                messageElement.style.color = 'white';
+            } else {
+                const randomIndex = Math.floor(Math.random() * wrongMessages.length);
+                const message = `回答错误！<br>${wrongMessages[randomIndex]}`;
+                messageElement.innerHTML = message;
+                messageElement.style.color = 'red';
+            }
+            document.getElementById("energy").textContent = `光之能量：${score}`;
+            updateProgressBar();
+
+            // 提示信息显示持续 3 秒
+            setTimeout(() => {
+                showNewQuestion();
+            }, 3000);
+        }
+
+        function updateProgressBar() {
+            const progress = (currentChallenge / totalChallenges) * 100;
+            document.getElementById("progressBar").style.width = progress + "%";
+        }
+
+        function endGame() {
+            clearInterval(countdownTimer);
+            challengeTime = Math.floor((Date.now() - startTime) / 1000);
+            const message = `挑战结束！最终得分：${score}分\n挑战时间：${formatTime(challengeTime)}`;
+            alert(message);
+
+            heroData.push({
+                name: playerName,
+                score: score,
+                time: new Date().toLocaleString(),
+                challengeTime: challengeTime
+            });
+
+            heroData.sort((a, b) => b.score - a.score || a.challengeTime - b.challengeTime);
+            localStorage.setItem('heroData', JSON.stringify(heroData));
+            displayHeroBoard();
+            resetGame();
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remaining = seconds % 60;
+            return `${minutes}分${remaining}秒`;
+        }
+
+        function displayHeroBoard() {
+            const heroList = document.getElementById("heroList");
+            heroList.innerHTML = '';
+            heroData.forEach((hero, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${hero.name}</td>
+                    <td>${hero.score}</td>
+                    <td>${formatTime(hero.challengeTime)}</td>
+                `;
+                heroList.appendChild(row);
+            });
+        }
+
+        function resetGame() {
+            document.getElementById("game").style.display = "none";
+            document.getElementById("intro").style.display = "block";
+            document.getElementById("countdown").style.display = "none";
+        }
+
+        function showHeroBoard() {
+            heroData = JSON.parse(localStorage.getItem('heroData')) || [];
+            displayHeroBoard();
+            document.getElementById("heroBoard").style.display = "block";
+        }
+
+        function closeHeroBoard() {
+            document.getElementById("heroBoard").style.display = "none";
+        }
+
+        function showSettings() {
+            const savedCount = localStorage.getItem('challengeCount');
+            const savedType = localStorage.getItem('challengeType');
+            if (savedCount) document.getElementById('challengeCount').value = savedCount;
+            if (savedType) document.getElementById('challengeType').value = savedType;
+            document.getElementById("settings").style.display = "block";
+        }
+
+        function saveSettings() {
+            const count = document.getElementById("challengeCount").value;
+            const type = document.getElementById("challengeType").value;
+            localStorage.setItem('challengeCount', count);
+            localStorage.setItem('challengeType', type);
+            alert("设置已保存！");
+            document.getElementById("settings").style.display = "none";
+        }
+
+        function toggleTimeOptions() {
+            const timeOptions = document.getElementById("timeOptions");
+            timeOptions.style.display = document.getElementById("timedModeSelect").value === "yes" ? "block" : "none";
+        }
+
+        function confirmEndGame() {
+            if (confirm("你确定要返回基地吗？")) {
+                endGame();
+            }
+        }
+
+        function clearHeroData() {
+            if (confirm("确定要清除所有历史记录吗？")) {
+                localStorage.removeItem('heroData');
+                heroData = [];
+                displayHeroBoard();
+            }
+        }
+
+        function playSound(type) {
+            const audio = new Audio();
+            audio.src = type === 'correct' ? 'https://example.com/correct.mp3' : 'https://example.com/wrong.mp3';
+            audio.play().catch(err => console.error('音效播放失败:', err));
+        }
+    </script>
+</body>
+
+</html>
